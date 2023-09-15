@@ -39,7 +39,7 @@ fetch('./json/data.json').then(res => res.json()).then(data => {
         }
         img0.classList.toggle('first');
 
-        if (times % 3 == 0) {
+        if (times == 1 || times % 3 == 0) {
             let red = Math.floor(Math.random() * 256);
             let green = Math.floor(Math.random() * 256);
             let blue = Math.floor(Math.random() * 256);
