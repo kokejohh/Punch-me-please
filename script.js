@@ -1,36 +1,35 @@
-let times = 0;
-document.onkeydown = function (e) {
-    if (e.repeat) return;
-    times += 1;
-    numberOfPunch.innerHTML = times;
+fetch('./json/data.json').then(res => res.json()).then(data => {
 
-    document.body.classList.add('idle');
-    if (img0.classList.contains('first')) {
-        img0.classList.remove('standby');
-        img0.classList.add('punch', 'p_left');
+    let times = 0;
+    let index = 0;
+
+    document.onkeydown = e => fn_pressdown(e);
+
+    document.onkeyup = e => fn_pressup(e);
+
+    if ('ontouchstart' in window) {
+        document.ontouchstart = e => fn_pressdown(e);
+        document.ontouchend = e => fn_pressup(e);
     } else {
-        img2.classList.remove('standby');
-        img2.classList.add('punch', 'p_right');
+        document.onmousedown = e => fn_pressdown(e);
+        document.onmouseup = e => fn_pressup(e);
     }
-    img0.classList.toggle('first');
-}
 
-
-document.onkeyup = function (e) {
-    img0.classList.remove('punch', 'p_left');
-    img0.classList.add('standby');
-    img2.classList.remove('punch', 'p_right');
-    img2.classList.add('standby');
-    document.body.classList.remove('idle');
-}
-
-if ('ontouchstart' in window) {
-    document.ontouchstart = function (e) {
+    function fn_pressdown(e) {
         if (e.repeat) return;
-        times += 1;
-        numberOfPunch.innerHTML = times;
 
-        document.body.classList.add('idle');
+        if (data[index]?.score === times) {
+            alias.innerHTML = 'ฉายา ' + data[index].alias;
+            img1.src = './img/' + data[index].pic;
+            index++;
+        }
+        times += 1;
+        numberOfPunch.innerHTML = times + '/' + (data[index]?.score ?? '∞');
+
+        let sd = new Audio('./sound.mp3');
+        sd.volume = 0.1;
+        sd.play();
+        container.classList.add('idle');
         if (img0.classList.contains('first')) {
             img0.classList.remove('standby');
             img0.classList.add('punch', 'p_left');
@@ -39,38 +38,21 @@ if ('ontouchstart' in window) {
             img2.classList.add('punch', 'p_right');
         }
         img0.classList.toggle('first');
-    }
 
-    document.ontouchend = function (e) {
-        img0.classList.remove('punch', 'p_left');
-        img0.classList.add('standby');
-        img2.classList.remove('punch', 'p_right');
-        img2.classList.add('standby');
-        document.body.classList.remove('idle');
-    }
-
-} else {
-    document.onmousedown = function (e) {
-        if (e.repeat) return;
-        times += 1;
-        numberOfPunch.innerHTML = times;
-
-        document.body.classList.add('idle');
-        if (img0.classList.contains('first')) {
-            img0.classList.remove('standby');
-            img0.classList.add('punch', 'p_left');
-        } else {
-            img2.classList.remove('standby');
-            img2.classList.add('punch', 'p_right');
+        if (times % 3 == 0) {
+            let red = Math.floor(Math.random() * 256);
+            let green = Math.floor(Math.random() * 256);
+            let blue = Math.floor(Math.random() * 256);
+            let bgColor = `rgb(${red}, ${green}, ${blue})`;
+            document.body.style.backgroundColor = bgColor;
         }
-        img0.classList.toggle('first');
     }
 
-    document.onmouseup = function (e) {
+    function fn_pressup(e) {
         img0.classList.remove('punch', 'p_left');
         img0.classList.add('standby');
         img2.classList.remove('punch', 'p_right');
         img2.classList.add('standby');
-        document.body.classList.remove('idle');
+        container.classList.remove('idle');
     }
-}
+});
